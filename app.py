@@ -12,19 +12,28 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        file = request.files.get('file')
-        if file and '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() == 'asc':
-            filename = file.filename
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            return redirect(url_for('chart', filename=filename))
+        files = request.files.getlist('file')  # Get a list of files
+        filenames = []
+        for file in files:
+            if file and '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() == 'asc':
+                filename = file.filename
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+                filenames.append(filename)
+        return redirect(url_for('chart', filenames=','.join(filenames)))
     return render_template('index.html')
 
-@app.route('/chart/<filename>')
-def chart(filename):
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    shifts, intensities = read_asc_file(file_path)
-    return render_template('chart.html', shifts=shifts, intensities=intensities)
+
+@app.route('/chart/<filenames>')
+def chart(filenames):
+    filenames = filenames.split(',')
+    datasets = []
+    for filename in filenames:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        shifts, intensities = read_asc_file(file_path)
+        datasets.append({'shifts': shifts, 'intensities': intensities, 'label': filename})
+    return render_template('chart.html', datasets=datasets)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
