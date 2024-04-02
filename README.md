@@ -31,6 +31,36 @@ python -m venv venv
 source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 ```
 
+### Install Dependencies
+Install the required Python packages using pip:
+```bash
+pip install -r requirements.txt
+```
+
+### Run the Application
+Start the Flask application with the following command:
+```bash
+export FLASK_APP=app.py
+flask run
+```
+The application should now be running on http://localhost:5000/. Open this URL in a web browser to use the application.
+
+
+### Usage
+To analyze your Raman data:
+
+Navigate to http://localhost:5000/ in your web browser.
+Click the "Choose File" button and select one or more .asc files to upload.
+Click the "Upload and Analyze" button to view the Raman shift chart(s) for the uploaded file(s).
+
+### Contributing
+Contributions to the Raman Data Analysis application are welcome. Please feel free to fork the repository, make changes, and submit pull requests.
+
+### License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+
+
 
 
 
