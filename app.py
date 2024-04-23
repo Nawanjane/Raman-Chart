@@ -51,6 +51,33 @@ def chart(filenames):
 
     return render_template('chart.html', datasets=datasets)
 
+@app.route('/process-folder', methods=['GET', 'POST'])
+def process_folder():
+    if request.method == 'POST':
+        # In this example, the user provides the folder path via a form input
+        folder_path = request.form.get('folder_path')
+        new_folder_path = os.path.join(folder_path, 'processed')
+
+        # Create a new directory for the processed results
+        os.makedirs(new_folder_path, exist_ok=True)
+
+        # Process each subfolder
+        for subfolder_name in os.listdir(folder_path):
+            subfolder_path = os.path.join(folder_path, subfolder_name)
+            if os.path.isdir(subfolder_path):
+                # Stack the data from .asc files in the subfolder
+                stacked_data, chart_image = stack_data_from_subfolder(subfolder_path)
+
+                # Save the stacked data as a new .asc file
+                stacked_filename = f'{subfolder_name}_stacked.asc'
+                save_stacked_data(stacked_data, os.path.join(new_folder_path, stacked_filename))
+
+                # Save the chart image
+                chart_image_filename = f'{subfolder_name}_chart.png'
+                chart_image.save(os.path.join(new_folder_path, chart_image_filename))
+
+        return redirect(url_for('folder_processed_successfully'))
+    return render_template('process_folder.html')
 
 
 if __name__ == '__main__':
