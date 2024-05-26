@@ -46,8 +46,11 @@ def chart(filenames):
         averaged_intensities = [sum(x) / len(x) for x in zip(*all_intensities)]
         datasets = [{'shifts': shifts, 'intensities': averaged_intensities, 'label': 'Averaged Data'}]
     else:
-        for filename, (shifts, intensities) in zip(filenames, all_intensities):
-            datasets.append({'shifts': shifts, 'intensities': intensities, 'label': filename})
+        for filename, intensities in zip(filenames, all_intensities):
+            if len(intensities) > 0:  # Check if intensities list has elements
+                shifts, intensities = read_asc_file(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                datasets.append({'shifts': shifts, 'intensities': intensities, 'label': filename})
+
 
     return render_template('chart.html', datasets=datasets)
 
